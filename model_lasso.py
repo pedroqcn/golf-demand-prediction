@@ -20,6 +20,8 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
+print("-------------------------------")
+
 # range of alpha to find the best penalty strength
 alphas = [0.0001, 0.001, 0.01, 0.1, 1.0]
 
@@ -39,3 +41,8 @@ print("-------------------------------")
 feature_names = X_train.columns.tolist()
 for name, coef in zip(feature_names, best_model.coef_):
     print(f"{name:<20} {coef:+.4f}")
+
+print("-------------------------------")
+# print standard deviation of each feature
+for name, std in zip(X_train.columns, scaler.scale_):
+    print(f"{name:<20} std = {std:.4f}")
