@@ -5,10 +5,6 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 df = load_and_clean()
 
-# separate features (X) from target (Y)
-y = df["Crowdedness"]
-X = df.drop(columns=["Crowdedness"])
-
 # split train and test sets chronologically
 # more efficient, since we're learning from past data and predicting future demand
 # -
