@@ -13,7 +13,6 @@ def load_and_clean():
 
     # drop play, date, and season
     df = df.drop(columns=df.filter(like="Play").columns)
-    df = df.drop(columns=["Season"])
 
     # cyclic encoding for Weekday
     df["Weekday_sin"] = np.sin(2 * np.pi * df["Weekday"] / 7)
@@ -35,7 +34,7 @@ def load_and_clean():
     df = df.drop(columns=["Month", "Month_num"])
 
     # one-hot encode Outlook
-    df = pd.get_dummies(df, columns=["Outlook"], dtype=int)
+    df = pd.get_dummies(df, columns=["Outlook", "Season"], dtype=int)
 
     return df
 
