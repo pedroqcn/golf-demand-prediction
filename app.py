@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from data_prep import load_and_clean, get_season_temp_ranges, get_season_humidity_ranges
 from model_lasso import train_lasso
 from model_linear import train_linear
 from model_rf import train_rf
@@ -17,6 +18,8 @@ def get_models():
 
 
 models = get_models()
+season_temp_ranges = get_season_temp_ranges()
+season_humidity_ranges = get_season_humidity_ranges()
 
 st.title("Golf Crowdedness Predictor")
 
@@ -30,12 +33,30 @@ with col1:
         options=[0, 1, 2, 3, 4, 5, 6],
         format_func=lambda x: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][x],
     )
-    season = st.selectbox("Season", ["Winter", "Spring", "Summer", "Fall"])
+    season = st.selectbox("Season", ["Winter", "Spring", "Summer", "Autumn"])
     holiday = st.checkbox("Holiday")
 
+temp_min = float(season_temp_ranges[season]["min"])
+temp_max = float(season_temp_ranges[season]["max"])
+temp_default = float((temp_min + temp_max) / 2)
+
+hum_min = float(season_humidity_ranges[season]["min"])
+hum_max = float(season_humidity_ranges[season]["max"])
+hum_default = float((hum_min + hum_max) / 2)
+
 with col2:
-    temperature = st.slider("Temperature (°C)", -10.0, 40.0, 20.0)
-    humidity = st.slider("Humidity (%)", 0.0, 100.0, 50.0)
+    temperature = st.slider(
+        "Temperature (°C)",
+        min_value=temp_min,
+        max_value=temp_max,
+        value=temp_default,
+    )
+    humidity = st.slider(
+        "Humidity (%)",
+        min_value=hum_min,
+        max_value=hum_max,
+        value=hum_default,
+    )
     windy = st.checkbox("Windy")
     outlook = st.selectbox("Outlook", ["sunny", "overcast", "rainy"])
 
