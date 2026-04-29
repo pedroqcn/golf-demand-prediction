@@ -5,14 +5,12 @@ from sklearn.model_selection import train_test_split
 
 
 def train_linear():
-    df = load_and_clean()
+    train, test = load_and_clean()
 
-    X = df.drop(columns=["Crowdedness"])
-    y = df["Crowdedness"]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train = train.drop(columns=["Crowdedness"])
+    y_train = train["Crowdedness"]
+    X_test = test.drop(columns=["Crowdedness"])
+    y_test = test["Crowdedness"]
 
     model = LinearRegression()
     model.fit(X_train, y_train)
@@ -26,14 +24,12 @@ def train_linear():
 
 
 if __name__ == "__main__":
-    df = load_and_clean()
+    train, test = load_and_clean()
 
-    X = df.drop(columns=["Crowdedness"])
-    y = df["Crowdedness"]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train = train.drop(columns=["Crowdedness"])
+    y_train = train["Crowdedness"]
+    X_test = test.drop(columns=["Crowdedness"])
+    y_test = test["Crowdedness"]
 
     model = LinearRegression()
     model.fit(X_train, y_train)
