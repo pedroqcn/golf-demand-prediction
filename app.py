@@ -6,7 +6,7 @@ from data_prep import load_and_clean, get_season_temp_ranges, get_season_humidit
 from model_lasso import train_lasso
 from model_linear import train_linear
 from model_rf import train_rf
-
+from model_gb import train_gb
 
 @st.cache_resource
 def get_models():
@@ -14,17 +14,29 @@ def get_models():
         "Lasso": train_lasso(),
         "Linear": train_linear(),
         "Random Forest": train_rf(),
+        "Gradient Boosting": train_gb(),
     }
 
-
+# Initialize models
 models = get_models()
 season_temp_ranges = get_season_temp_ranges()
 season_humidity_ranges = get_season_humidity_ranges()
 
 st.title("Golf Crowdedness Predictor")
 
-choice = st.radio("Model", ["Lasso", "Linear", "Random Forest"], horizontal=True)
-model, scaler, feature_names = models[choice]
+choice = st.radio("Model", ["Lasso", "Linear", "Random Forest", "Gradient Boosting"], horizontal=True)
+model, scaler, feature_names, scores = models[choice]
+
+st.subheader("Model Accuracy Comparison")
+comparison_df = pd.DataFrame(
+    {name: models[name][3] for name in ["Lasso", "Linear", "Random Forest", "Gradient Boosting"]}
+).T
+comparison_df.columns = ["Train R²", "Test R²"]
+st.dataframe(comparison_df.style.format("{:.4f}"))
+
+c1, c2 = st.columns(2)
+c1.metric(f"{choice} Train R²", f"{scores['train_r2']:.4f}")
+c2.metric(f"{choice} Test R²", f"{scores['test_r2']:.4f}")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -85,7 +97,7 @@ if st.button("Predict"):
 
 st.divider()
 
-if choice == "Random Forest":
+if choice in ("Random Forest", "Gradient Boosting"):
     st.subheader("Feature Importances")
     imp_df = pd.DataFrame({
         "feature": feature_names,

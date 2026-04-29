@@ -11,7 +11,7 @@ def train_rf():
     X = df.drop(columns=["Crowdedness"])
     y = df["Crowdedness"]
 
-    X_train, _, y_train, _ = train_test_split(
+    X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
@@ -24,9 +24,14 @@ def train_rf():
     )
     model.fit(X_train, y_train)
 
-    return model, None, X_train.columns.tolist()
+    scores = {
+        "train_r2": r2_score(y_train, model.predict(X_train)),
+        "test_r2": r2_score(y_test, model.predict(X_test)),
+    }
 
+    return model, None, X_train.columns.tolist(), scores
 
+# guard clause to prevent running when imported
 if __name__ == "__main__":
     df = load_and_clean()
 
