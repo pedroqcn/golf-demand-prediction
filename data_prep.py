@@ -9,7 +9,13 @@ def load_and_clean():
         The clean DataFrame
     """
 
-    df = pd.read_csv("golf_dataset/golf_dataset_wide_format.csv")
+    train = pd.read_csv("golf_dataset/split_sets/training_data.csv")
+    test = pd.read_csv("golf_dataset/split_sets/test_data.csv")
+
+    # combine temporarily train and test
+    train["_split"] = "train"
+    test["_split"] = "test"
+    df = pd.concat([train, test], ignore_index=True)
 
     # drop play columns, date, and month
     df = df.drop(columns=df.filter(like="Play").columns)
@@ -24,7 +30,10 @@ def load_and_clean():
     # one-hot encode Outlook and Season
     df = pd.get_dummies(df, columns=["Outlook", "Season"], dtype=int)
 
-    return df
+    train = df[df["_split"] == "train"].drop(columns=["_split"])
+    test = df[df["_split"] == "test"].drop(columns=["_split"])
+
+    return train, test
 
 def get_season_temp_ranges():
     """
@@ -57,6 +66,6 @@ def get_season_humidity_ranges():
     return ranges
 
 if __name__ == "__main__":
-    df = load_and_clean()
-    print(df.columns.tolist())
-    print(df.shape)
+    train, test = load_and_clean()
+    print(f"Train: {train.shape}, Test: {test.shape}")
+    print(train.columns.tolist())
