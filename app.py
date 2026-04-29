@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
+import matplotlib.pyplot as plt
 
 from data_prep import load_and_clean, get_season_temp_ranges, get_season_humidity_ranges
 from model_lasso import train_lasso
@@ -94,6 +95,26 @@ if st.button("Predict"):
     prediction = model.predict(X_final)[0]
 
     st.metric("Predicted Crowdedness", f"{prediction:.2f}")
+
+    st.subheader("Actual vs. Predicted Crowdedness")
+    train, test = load_and_clean()
+    X_test = test.drop(columns=["Crowdedness"])
+    y_test = test["Crowdedness"]
+    
+    if scaler is not None:
+        X_test_final = scaler.transform(X_test)
+    else:
+        X_test_final = X_test
+
+    y_pred = model.predict(X_test_final)
+
+    fig, ax = plt.subplots()
+    ax.scatter(y_test, y_pred, alpha=0.5)
+    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], "r--")
+    ax.set_xlabel("Actual Crowdedness")
+    ax.set_ylabel("Predicted Crowdedness")
+    ax.set_title(f"{choice} Model Performance")
+    st.pyplot(fig)
 
 st.divider()
 

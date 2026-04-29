@@ -16,6 +16,7 @@ Each model script prints its own evaluation when run directly:
 python model_linear.py
 python model_lasso.py
 python model_rf.py
+python model_gb.py
 ```
 
 ## Running the web app
