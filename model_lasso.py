@@ -31,9 +31,8 @@ def train_lasso(alpha=0.0001):
     scores = {
         "train_r2": r2_score(y_train, model.predict(X_train_scaled)),
         "test_r2": r2_score(y_test, model.predict(X_test_scaled)),
-        "cv_mean": cv_scores.mean(),
-        "cv_std": cv_scores.std(),
-        "cv_scores": cv_scores
+        "cv_mean": None,
+        "cv_std": None,
     }
 
     return model, scaler, X_train.columns.tolist(), scores

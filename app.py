@@ -29,11 +29,18 @@ choice = st.radio("Model", ["Lasso", "Linear", "Random Forest", "Gradient Boosti
 model, scaler, feature_names, scores = models[choice]
 
 st.subheader("Model Accuracy Comparison")
-comparison_df = pd.DataFrame(
-    {name: models[name][3] for name in ["Lasso", "Linear", "Random Forest", "Gradient Boosting"]}
-).T
-comparison_df.columns = ["Train R²", "Test R²"]
-st.dataframe(comparison_df.style.format("{:.4f}"))
+comparison_data = {}
+for name in ["Lasso", "Linear", "Random Forest", "Gradient Boosting"]:
+    s = models[name][3]
+    comparison_data[name] = {
+        "Train R²": s["train_r2"],
+        "Test R²": s["test_r2"],
+        "CV R² Mean": s["cv_mean"],
+        "CV R² Standard Deviation": s["cv_std"],
+    }
+
+comparison_df = pd.DataFrame(comparison_data)
+st.dataframe(comparison_df.style.format("{:.4f}", na_rep="-"))
 
 c1, c2 = st.columns(2)
 c1.metric(f"{choice} Train R²", f"{scores['train_r2']:.4f}")
@@ -95,26 +102,6 @@ if st.button("Predict"):
     prediction = model.predict(X_final)[0]
 
     st.metric("Predicted Crowdedness", f"{prediction:.2f}")
-
-    st.subheader("Actual vs. Predicted Crowdedness")
-    train, test = load_and_clean()
-    X_test = test.drop(columns=["Crowdedness"])
-    y_test = test["Crowdedness"]
-    
-    if scaler is not None:
-        X_test_final = scaler.transform(X_test)
-    else:
-        X_test_final = X_test
-
-    y_pred = model.predict(X_test_final)
-
-    fig, ax = plt.subplots()
-    ax.scatter(y_test, y_pred, alpha=0.5)
-    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], "r--")
-    ax.set_xlabel("Actual Crowdedness")
-    ax.set_ylabel("Predicted Crowdedness")
-    ax.set_title(f"{choice} Model Performance")
-    st.pyplot(fig)
 
 st.divider()
 
