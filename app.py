@@ -3,11 +3,14 @@ import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 
-from data_prep import load_and_clean, get_season_temp_ranges, get_season_humidity_ranges
+from data_prep import load_and_clean, get_month_temp_ranges, get_month_humidity_ranges
 from model_lasso import train_lasso
 from model_linear import train_linear
 from model_rf import train_rf
 from model_gb import train_gb
+
+MONTH_ORDER = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 @st.cache_resource
 def get_models():
@@ -20,8 +23,8 @@ def get_models():
 
 # Initialize models
 models = get_models()
-season_temp_ranges = get_season_temp_ranges()
-season_humidity_ranges = get_season_humidity_ranges()
+month_temp_ranges = get_month_temp_ranges()
+month_humidity_ranges = get_month_humidity_ranges()
 
 st.title("Golf Crowdedness Predictor")
 
@@ -53,15 +56,15 @@ with col1:
         options=[0, 1, 2, 3, 4, 5, 6],
         format_func=lambda x: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][x],
     )
-    season = st.selectbox("Season", ["Winter", "Spring", "Summer", "Autumn"])
+    month = st.selectbox("Month", MONTH_ORDER)
     holiday = st.checkbox("Holiday")
 
-temp_min = float(season_temp_ranges[season]["min"])
-temp_max = float(season_temp_ranges[season]["max"])
+temp_min = float(month_temp_ranges[month]["min"])
+temp_max = float(month_temp_ranges[month]["max"])
 temp_default = float((temp_min + temp_max) / 2)
 
-hum_min = float(season_humidity_ranges[season]["min"])
-hum_max = float(season_humidity_ranges[season]["max"])
+hum_min = float(month_humidity_ranges[month]["min"])
+hum_max = float(month_humidity_ranges[month]["max"])
 hum_default = float((hum_min + hum_max) / 2)
 
 with col2:
@@ -89,13 +92,13 @@ if st.button("Predict"):
     row["Weekday_sin"] = np.sin(2 * np.pi * weekday / 7)
     row["Weekday_cos"] = np.cos(2 * np.pi * weekday / 7)
 
+    month_num = MONTH_ORDER.index(month)
+    row["Month_sin"] = np.sin(2 * np.pi * month_num / 12)
+    row["Month_cos"] = np.cos(2 * np.pi * month_num / 12)
+
     outlook_col = f"Outlook_{outlook}"
     if outlook_col in row:
         row[outlook_col] = 1
-
-    season_col = f"Season_{season}"
-    if season_col in row:
-        row[season_col] = 1
 
     X_input = pd.DataFrame([row])[feature_names]
     X_final = scaler.transform(X_input) if scaler is not None else X_input

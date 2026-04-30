@@ -43,30 +43,30 @@ def load_and_clean():
 
     return train, test
 
-def get_season_temp_ranges():
+def get_month_temp_ranges():
     """
-    Returns min and max temperature for each season
+    Returns min and max temperature for each month
     before one-hot encoding.
     """
     df = pd.read_csv("golf_dataset/golf_dataset_wide_format.csv")
 
     ranges = (
-        df.groupby("Season")["Temperature"]
+        df.groupby("Month")["Temperature"]
         .agg(["min", "max"])
         .to_dict(orient="index")
     )
 
     return ranges
 
-def get_season_humidity_ranges():
+def get_month_humidity_ranges():
     """
-    Returns min and max humidity for each season
+    Returns min and max humidity for each month
     before one-hot encoding.
     """
     df = pd.read_csv("golf_dataset/golf_dataset_wide_format.csv")
 
     ranges = (
-        df.groupby("Season")["Humidity"]
+        df.groupby("Month")["Humidity"]
         .agg(["min", "max"])
         .to_dict(orient="index")
     )
