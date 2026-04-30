@@ -19,16 +19,24 @@ def load_and_clean():
 
     # drop play columns, date, and month
     df = df.drop(columns=df.filter(like="Play").columns)
-    df = df.drop(columns=["Date", "Month"])
+    df = df.drop(columns=["Date", "Season"])
 
-    # cyclic encoding for Weekday
+    month_map = {
+        "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+        "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+    }
+    df["Month"] = df["Month"].map(month_map)
+
+    # cyclic encoding for Weekdays and Months
     df["Weekday_sin"] = np.sin(2 * np.pi * df["Weekday"] / 7)
     df["Weekday_cos"] = np.cos(2 * np.pi * df["Weekday"] / 7)
-
+    df["Month_sin"]   = np.sin(2 * np.pi * df["Month"]   / 12)
+    df["Month_cos"]   = np.cos(2 * np.pi * df["Month"]   / 12)
     df = df.drop(columns=["Weekday"]) # the sine and cosine pair replaces the weekday column
+    df = df.drop(columns=["Month"])
 
-    # one-hot encode Outlook and Season
-    df = pd.get_dummies(df, columns=["Outlook", "Season"], dtype=int)
+    # one-hot encode Outlook
+    df = pd.get_dummies(df, columns=["Outlook"], dtype=int)
 
     train = df[df["_split"] == "train"].drop(columns=["_split"])
     test = df[df["_split"] == "test"].drop(columns=["_split"])
