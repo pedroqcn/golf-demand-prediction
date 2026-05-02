@@ -62,9 +62,9 @@ The app lets you select weather and calendar conditions, choose a model, and pre
 ## Key Findings
 
 - **Humidity**, **Weekday**, and **Temperature** are the three strongest predictors across all models
-- **Season** adds almost no predictive value — weather features already capture seasonal effects
+- **Season** adds almost no predictive value, weather features already capture seasonal effects
 - **Lasso** found **Outlook_overcast** to be the only truly uninformative feature
-- **Temperature** has a non-linear, inverted-U relationship with crowdedness — linear models can't capture this, which explains their lower performance
+- **Temperature** has a non-linear, inverted-U relationship with crowdedness; linear models can't capture this, which explains their lower performance
 - **Gradient Boosting** achieved the best test R² (≈ 0.90) with the least overfitting among non-linear models
 
 ## Authors
